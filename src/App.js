@@ -4,6 +4,7 @@ import Navigation from "./components/Navigation/Navigation";
 import Logo from "./components/Logo/Logo";
 import ImageLinkForm from "./components/ImageLinkForm/ImageLinkForm";
 import Rank from "./components/Rank/Rank";
+import Particle from "./components/Particle/Particle";
 
 class App extends Component {
   render() {
@@ -13,6 +14,7 @@ class App extends Component {
         <Logo />
         <Rank />
         <ImageLinkForm />
+        <Particle className="particles" />
         {/*
         
         <FaceRecognition /> */}
