@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import Navigation from "./components/Navigation/Navigation";
 import Logo from "./components/Logo/Logo";
 import ImageLinkForm from "./components/ImageLinkForm/ImageLinkForm";
+import FaceRecognition from "./components/FaceRecognition/FaceRecognition";
 import Rank from "./components/Rank/Rank";
 import Particle from "./components/Particle/Particle";
 
@@ -11,6 +12,8 @@ class App extends Component {
     super();
     this.state = {
       input: "",
+      imageUrl: "",
+      box: "",
     };
   }
 
@@ -33,9 +36,7 @@ class App extends Component {
           onButtonSubmit={this.onButtonSubmit}
         />
         <Particle className="particles" />
-        {/*
-        
-        <FaceRecognition /> */}
+        <FaceRecognition />
       </div>
     );
   }
