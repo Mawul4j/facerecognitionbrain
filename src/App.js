@@ -13,16 +13,83 @@ class App extends Component {
     this.state = {
       input: "",
       imageUrl: "",
-      box: "",
+      box: {},
     };
   }
 
+  // calculateFaceLocation = (data) => {
+  //   const clarifaiFace =
+  //     data.outputs[0].data.regions[0].region_info.bounding_box;
+  //   const image = document.getElementById("inputimage");
+  //   const width = Number(image.width);
+  //   const height = Number(image.height);
+  //   return {
+  //     leftCol: clarifaiFace.left_col * width,
+  //     topRow: clarifaiFace.top_row * height,
+  //     rightCol: width - clarifaiFace.right_col * width,
+  //     bottomRow: height - clarifaiFace.bottom_row * height,
+  //   };
+  // };
+
+  calculateFaceLocation = (data) => {
+    const clarifaiFace =
+      data.outputs[0].data.regions[0].region_info.bounding_box;
+    const image = document.getElementById("inputimage");
+    const width = Number(image.width);
+    const height = Number(image.height);
+    return {
+      leftCol: clarifaiFace.left_col * width,
+      topRow: clarifaiFace.top_row * height,
+      rightCol: width - clarifaiFace.right_col * width,
+      bottomRow: height - clarifaiFace.bottom_row * height,
+    };
+  };
+
+  displayFaceBox = (box) => {
+    console.log(box);
+    this.setState({ box });
+  };
+
   onInputChange = (event) => {
-    console.log(event.target.value);
+    this.setState({ input: event.target.value });
   };
 
   onButtonSubmit = () => {
     console.log("click");
+    this.setState({ imageUrl: this.state.input });
+
+    const raw = JSON.stringify({
+      user_app_id: {
+        user_id: "openvino",
+        app_id: "face-detection",
+      },
+      inputs: [
+        {
+          data: {
+            image: {
+              url: this.state.input,
+            },
+          },
+        },
+      ],
+    });
+
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        // eslint-disable-next-line no-useless-concat
+        Authorization: "Key " + "3db282eedc3849d38702b00105f16f41",
+      },
+      body: raw,
+    };
+    fetch(
+      `https://api.clarifai.com/v2/models/face-detection-0200/outputs`,
+      requestOptions
+    )
+      .then((response) => response.json())
+      .then((result) => this.displayFaceBox(this.calculateFaceLocation(result)))
+      .catch((error) => console.log("error", error));
   };
 
   render() {
@@ -36,7 +103,7 @@ class App extends Component {
           onButtonSubmit={this.onButtonSubmit}
         />
         <Particle className="particles" />
-        <FaceRecognition />
+        <FaceRecognition box={this.state.box} imageUrl={this.state.imageUrl} />
       </div>
     );
   }
