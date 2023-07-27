@@ -43,16 +43,37 @@ class App extends Component {
   };
 
   calculateFaceLocation = (data) => {
-    const clarifaiFace =
-      data.outputs[0].data.regions[0].region_info.bounding_box;
+    const clarifaiOutput = data?.outputs?.[0];
+    if (!clarifaiOutput) {
+      throw new Error("Invalid data format: No outputs found.");
+    }
+
+    const regions = clarifaiOutput?.data?.regions;
+    if (!regions || regions.length === 0) {
+      throw new Error("No regions found in the output.");
+    }
+
+    const firstRegion = regions[0];
+    const boundingBox = firstRegion?.region_info?.bounding_box;
+    if (!boundingBox) {
+      throw new Error(
+        "Invalid data format: Bounding box not found in the region."
+      );
+    }
+
     const image = document.getElementById("inputimage");
+    if (!image || isNaN(image.width) || isNaN(image.height)) {
+      throw new Error("Invalid image element or image dimensions.");
+    }
+
     const width = Number(image.width);
     const height = Number(image.height);
+
     return {
-      leftCol: clarifaiFace.left_col * width,
-      topRow: clarifaiFace.top_row * height,
-      rightCol: width - clarifaiFace.right_col * width,
-      bottomRow: height - clarifaiFace.bottom_row * height,
+      leftCol: boundingBox.left_col * width,
+      topRow: boundingBox.top_row * height,
+      rightCol: width - boundingBox.right_col * width,
+      bottomRow: height - boundingBox.bottom_row * height,
     };
   };
 
@@ -65,10 +86,12 @@ class App extends Component {
   };
 
   onButtonSubmit = () => {
-    console.log("click");
-    this.setState({ imageUrl: this.state.input });
+    const { input, user } = this.state;
 
-    const raw = JSON.stringify({
+    // Update the imageUrl state with the input value
+    this.setState({ imageUrl: input });
+
+    const clarifaiRequest = {
       user_app_id: {
         user_id: "openvino",
         app_id: "face-detection",
@@ -77,28 +100,49 @@ class App extends Component {
         {
           data: {
             image: {
-              url: this.state.input,
+              url: input,
             },
           },
         },
       ],
-    });
+    };
 
     const requestOptions = {
       method: "POST",
       headers: {
         Accept: "application/json",
-        // eslint-disable-next-line no-useless-concat
-        Authorization: "Key " + "3db282eedc3849d38702b00105f16f41",
+        Authorization: "Key 3db282eedc3849d38702b00105f16f41",
       },
-      body: raw,
+      body: JSON.stringify(clarifaiRequest),
     };
+
     fetch(
       `https://api.clarifai.com/v2/models/face-detection/outputs`,
       requestOptions
     )
-      .then((response) => response.json())
-      .then((result) => this.displayFaceBox(this.calculateFaceLocation(result)))
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok.");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (!data.outputs || data.outputs.length === 0) {
+          throw new Error("Invalid data format: No outputs found.");
+        }
+
+        // Display the face box using the calculated face location
+        this.displayFaceBox(this.calculateFaceLocation(data));
+
+        // Proceed with updating the number of entries in the backend
+        return fetch("http://localhost:3000/image", {
+          method: "put",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: user.id,
+          }),
+        });
+      })
       .catch((error) => console.log("error", error));
   };
 
