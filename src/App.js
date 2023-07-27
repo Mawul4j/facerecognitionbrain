@@ -94,7 +94,7 @@ class App extends Component {
       body: raw,
     };
     fetch(
-      `https://api.clarifai.com/v2/models/face-detection-0200/outputs`,
+      `https://api.clarifai.com/v2/models/face-detection/outputs`,
       requestOptions
     )
       .then((response) => response.json())
