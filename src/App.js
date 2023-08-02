@@ -115,7 +115,6 @@ class App extends Component {
       },
       body: JSON.stringify(clarifaiRequest),
     };
-
     fetch(
       `https://api.clarifai.com/v2/models/face-detection/outputs`,
       requestOptions
@@ -142,6 +141,22 @@ class App extends Component {
             id: user.id,
           }),
         });
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Error updating entries count in the backend.");
+        }
+
+        // Fetch the updated entries count from the response and update the state
+        return response.json();
+      })
+      .then((count) => {
+        this.setState((prevState) => ({
+          user: {
+            ...prevState.user,
+            entries: count, // Set the updated entries count received from the backend
+          },
+        }));
       })
       .catch((error) => console.log("error", error));
   };
