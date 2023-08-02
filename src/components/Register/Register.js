@@ -7,37 +7,55 @@ class Register extends React.Component {
       email: "",
       password: "",
       name: "",
+      showError: false, // Add a state to track the error message visibility
     };
   }
 
   onNameChange = (event) => {
     this.setState({ name: event.target.value });
   };
+
   onEmailChange = (event) => {
     this.setState({ email: event.target.value });
   };
+
   onPasswordChange = (event) => {
     this.setState({ password: event.target.value });
   };
 
+  // Function to check if the registration form fields are filled
+  isValidRegistration = () => {
+    const { name, email, password } = this.state;
+    return name.trim() !== "" && email.trim() !== "" && password.trim() !== "";
+  };
+
   onSubmitRegister = () => {
-    fetch("http://localhost:3000/register", {
-      method: "post",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: this.state.email,
-        password: this.state.password,
-        name: this.state.name,
-      }),
-    })
-      .then((response) => response.json())
-      .then((user) => {
-        this.props.loadUser(user);
-        this.props.onRouteChange("home");
-      });
+    if (this.isValidRegistration()) {
+      fetch("http://localhost:3000/register", {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: this.state.email,
+          password: this.state.password,
+          name: this.state.name,
+        }),
+      })
+        .then((response) => response.json())
+        .then((user) => {
+          if (user.id) {
+            this.props.loadUser(user);
+            this.props.onRouteChange("home");
+          }
+        });
+    } else {
+      // Show the error message if any of the fields are empty
+      this.setState({ showError: true });
+    }
   };
 
   render() {
+    const { showError } = this.state;
+
     return (
       <article className="br3 ba b--black-10 mv4 w-100 w-50-m w-25-l mw6 shadow-5 center">
         <main className="pa4 black-80">
@@ -89,6 +107,9 @@ class Register extends React.Component {
                 type="submit"
                 value="Register"
               />
+              {showError && (
+                <p className="blue b">Please fill in all the fields.</p>
+              )}
             </div>
           </div>
         </main>
