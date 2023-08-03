@@ -91,11 +91,14 @@ class App extends Component {
     // Update the imageUrl state with the input value
     this.setState({ imageUrl: input });
 
-    fetch("http://localhost:3000/imageurl", {
-      method: "post",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ input: input }), // Send the input image URL to the backend
-    })
+    fetch(
+      "https://protected-springs-76462-5801240df113.herokuapp.com/imageurl",
+      {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ input: input }), // Send the input image URL to the backend
+      }
+    )
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok.");
@@ -111,13 +114,16 @@ class App extends Component {
         this.displayFaceBox(this.calculateFaceLocation(data));
 
         // Proceed with updating the number of entries in the backend
-        return fetch("http://localhost:3000/image", {
-          method: "put",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            id: user.id,
-          }),
-        });
+        return fetch(
+          "https://protected-springs-76462-5801240df113.herokuapp.com/image",
+          {
+            method: "put",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: user.id,
+            }),
+          }
+        );
       })
       .then((response) => {
         if (!response.ok) {
@@ -137,131 +143,6 @@ class App extends Component {
       })
       .catch((error) => console.log("error", error));
   };
-
-  // onButtonSubmit = () => {
-  //   const { input, user } = this.state;
-
-  //   // Update the imageUrl state with the input value
-  //   this.setState({ imageUrl: input });
-
-  //   fetch("http://localhost:3000/imageurl", {
-  //     method: "post", // Use POST request to send the input image URL to the backend
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({ imageUrl: input }), // Send the input image URL to the backend
-  //   })
-  //     .then((response) => {
-  //       if (!response.ok) {
-  //         throw new Error("Network response was not ok.");
-  //       }
-  //       return response.json();
-  //     })
-  //     .then((data) => {
-  //       // Display the face box using the calculated face location
-  //       this.displayFaceBox(this.calculateFaceLocation(data));
-
-  //       // Proceed with updating the number of entries in the backend
-  //       return fetch("http://localhost:3000/image", {
-  //         method: "put",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify({
-  //           id: user.id,
-  //         }),
-  //       });
-  //     })
-  //     .then((response) => {
-  //       if (!response.ok) {
-  //         throw new Error("Error updating entries count in the backend.");
-  //       }
-
-  //       // Fetch the updated entries count from the response and update the state
-  //       return response.json();
-  //     })
-  //     .then((count) => {
-  //       this.setState((prevState) => ({
-  //         user: {
-  //           ...prevState.user,
-  //           entries: count, // Set the updated entries count received from the backend
-  //         },
-  //       }));
-  //     })
-  //     .catch((error) => console.log("error", error));
-  // };
-
-  // onButtonSubmit = () => {
-  //   const { input, user } = this.state;
-
-  //   // Update the imageUrl state with the input value
-  //   this.setState({ imageUrl: input });
-
-  //   const clarifaiRequest = {
-  //     user_app_id: {
-  //       user_id: "openvino",
-  //       app_id: "face-detection",
-  //     },
-  //     inputs: [
-  //       {
-  //         data: {
-  //           image: {
-  //             url: input,
-  //           },
-  //         },
-  //       },
-  //     ],
-  //   };
-
-  //   const requestOptions = {
-  //     method: "POST",
-  //     headers: {
-  //       Accept: "application/json",
-  //       Authorization: "Key 3db282eedc3849d38702b00105f16f41",
-  //     },
-  //     body: JSON.stringify(clarifaiRequest),
-  //   };
-  //   fetch(
-  //     `https://api.clarifai.com/v2/models/face-detection/outputs`,
-  //     requestOptions
-  //   )
-  //     .then((response) => {
-  //       if (!response.ok) {
-  //         throw new Error("Network response was not ok.");
-  //       }
-  //       return response.json();
-  //     })
-  //     .then((data) => {
-  //       if (!data.outputs || data.outputs.length === 0) {
-  //         throw new Error("Invalid data format: No outputs found.");
-  //       }
-
-  //       // Display the face box using the calculated face location
-  //       this.displayFaceBox(this.calculateFaceLocation(data));
-
-  //       // Proceed with updating the number of entries in the backend
-  //       return fetch("http://localhost:3000/image", {
-  //         method: "put",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify({
-  //           id: user.id,
-  //         }),
-  //       });
-  //     })
-  //     .then((response) => {
-  //       if (!response.ok) {
-  //         throw new Error("Error updating entries count in the backend.");
-  //       }
-
-  //       // Fetch the updated entries count from the response and update the state
-  //       return response.json();
-  //     })
-  //     .then((count) => {
-  //       this.setState((prevState) => ({
-  //         user: {
-  //           ...prevState.user,
-  //           entries: count, // Set the updated entries count received from the backend
-  //         },
-  //       }));
-  //     })
-  //     .catch((error) => console.log("error", error));
-  // };
 
   onRouteChange = (route) => {
     if (route === "signout") {

@@ -31,15 +31,18 @@ class Register extends React.Component {
 
   onSubmitRegister = () => {
     if (this.isValidRegistration()) {
-      fetch("http://localhost:3000/register", {
-        method: "post",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: this.state.email,
-          password: this.state.password,
-          name: this.state.name,
-        }),
-      })
+      fetch(
+        "https://protected-springs-76462-5801240df113.herokuapp.com/register",
+        {
+          method: "post",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: this.state.email,
+            password: this.state.password,
+            name: this.state.name,
+          }),
+        }
+      )
         .then((response) => response.json())
         .then((user) => {
           if (user.id) {
