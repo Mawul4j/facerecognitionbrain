@@ -12,6 +12,7 @@ const ImageLinkForm = ({ onInputChange, onButtonSubmit }) => {
           <input
             className="f4 pa2 w-70 center"
             type="tex"
+            placeholder="Input an image url"
             onChange={onInputChange}
           />
           <button
